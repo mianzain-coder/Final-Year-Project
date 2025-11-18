@@ -1,65 +1,198 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather App</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIP Marketing Content Generator</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(-45deg, #0f0f0f, #1a1a1a, #0f0f0f, #111111);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+    }
+
+    @keyframes gradientBG {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .card {
+        width: 480px;
+        padding: 35px;
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+        animation: fadeIn 1s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+        color: #fff;
+        text-align: center;
+        font-weight: 600;
+        margin-bottom: 30px;
+        font-size: 28px;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 14px;
+        margin-top: 12px;
+        border-radius: 12px;
+        border: none;
+        outline: none;
+        background: rgba(255, 255, 255, 0.15);
+        color: #fff;
+        font-size: 15px;
+        transition: 0.3s;
+    }
+
+    input::placeholder {
+        color: #ccc;
+    }
+
+    input:focus, select:focus {
+        background: rgba(255, 255, 255, 0.25);
+        box-shadow: 0 0 15px rgba(255,255,255,0.2);
+    }
+
+    select {
+        cursor: pointer;
+    }
+
+    button {
+        width: 100%;
+        padding: 14px;
+        margin-top: 20px;
+        border-radius: 12px;
+        border: none;
+        background: linear-gradient(135deg, #ff6a00, #ee0979);
+        color: #fff;
+        font-size: 17px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    button:hover {
+        opacity: 0.9;
+        transform: scale(1.04);
+        box-shadow: 0 0 15px rgba(255, 106, 0, 0.5);
+    }
+
+    #resultBox {
+        width: 100%;
+        margin-top: 25px;
+        padding: 18px;
+        background: linear-gradient(135deg, #1f1c2c, #928dab);
+        color: #fff;
+        border-radius: 14px;
+        display: none;
+        font-size: 15px;
+        line-height: 1.6;
+        white-space: pre-line;
+        position: relative;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
+
+    #copyBtn {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        padding: 6px 10px;
+        background: rgba(255,255,255,0.2);
+        border: none;
+        border-radius: 6px;
+        color: #fff;
+        cursor: pointer;
+        font-size: 12px;
+        transition: 0.3s;
+    }
+
+    #copyBtn:hover {
+        background: rgba(255,255,255,0.35);
+    }
+
+    @media(max-width: 520px){
+        .card { width: 90%; padding: 25px; }
+        h1 { font-size: 24px; }
+        button, input, select { font-size: 14px; padding: 12px; }
+    }
+</style>
 </head>
+
 <body>
-    <div class="container">
-        <h1>Weather App</h1>
-        <form id="weatherForm">
-            <input type="text" id="city" placeholder="Enter city name" required>
-            <button type="submit">Get Weather</button>
-        </form>
 
-        <div id="result" class="hidden">
-            <h2 id="location"></h2>
-            <p id="dayDate"></p>
-            <img id="icon" src="" alt="Weather Icon">
-            <p><strong>Temperature:</strong> <span id="temperature"></span> °C</p>
-            <p><strong>Condition:</strong> <span id="condition"></span></p>
-            <p><strong>Humidity:</strong> <span id="humidity"></span>%</p>
-            <p><strong>Wind Speed:</strong> <span id="wind"></span> kph</p>
-        </div>
-        <p id="error" class="error"></p>
+<div class="card">
+    <h1>✨ VIP Marketing Generator</h1>
+
+    <input type="text" id="product" placeholder="Enter product or brand name">
+
+    <select id="feature">
+        <option value="long">Detailed Description</option>
+        <option value="caption">Social Media Caption</option>
+        <option value="hashtag">Hashtags</option>
+        <option value="slogan">Catchy Tagline</option>
+        <option value="short">Quick Line</option>
+        <option value="adcopy">Ad Copy</option>
+    </select>
+
+    <button onclick="generate()">Generate Content</button>
+
+    <div id="resultBox">
+        <button id="copyBtn" onclick="copyText()">Copy</button>
+        <div id="resultText"></div>
     </div>
+</div>
 
-    <script>
-        const form = document.getElementById('weatherForm');
-        const resultDiv = document.getElementById('result');
-        const errorDiv = document.getElementById('error');
+<script>
+async function generate() {
+    const product = document.getElementById("product").value;
+    const feature = document.getElementById("feature").value;
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const city = document.getElementById('city').value;
-            errorDiv.textContent = '';
-            resultDiv.classList.add('hidden');
+    if (!product.trim()) {
+        alert("Please enter a product name.");
+        return;
+    }
 
-            const formData = new FormData();
-            formData.append('city', city);
+    const res = await fetch("/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ product: product, feature: feature })
+    });
 
-            const response = await fetch('/weather', {
-                method: 'POST',
-                body: formData
-            });
+    const data = await res.json();
 
-            const data = await response.json();
+    const resultBox = document.getElementById("resultBox");
+    const resultText = document.getElementById("resultText");
 
-            if (data.error) {
-                errorDiv.textContent = data.error;
-            } else {
-                document.getElementById('location').textContent = data.location;
-                document.getElementById('dayDate').textContent = `${data.day}, ${data.date}`;
-                document.getElementById('temperature').textContent = data.temperature_c;
-                document.getElementById('condition').textContent = data.condition;
-                document.getElementById('humidity').textContent = data.humidity;
-                document.getElementById('wind').textContent = data.wind_kph;
-                document.getElementById('icon').src = data.icon;
-                resultDiv.classList.remove('hidden');
-            }
-        });
-    </script>
+    resultBox.style.display = "block";
+    resultText.innerText = data.content;
+}
+
+function copyText() {
+    const resultText = document.getElementById("resultText").innerText;
+    navigator.clipboard.writeText(resultText).then(() => {
+        alert("Copied to clipboard!");
+    });
+}
+</script>
+
 </body>
 </html>
